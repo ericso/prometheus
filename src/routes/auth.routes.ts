@@ -1,14 +1,15 @@
 import { Router, Request, Response, RequestHandler } from 'express';
-import { register, login } from '../controllers/auth.controller';
+import { AuthController } from '../controllers/auth.controller';
 
 const router = Router();
+const authController = new AuthController();
 
 router.post('/register', ((req: Request, res: Response) => {
-  void register(req, res);
+  void authController.register(req, res);
 }) as RequestHandler);
 
 router.post('/login', ((req: Request, res: Response) => {
-  void login(req, res);
+  void authController.login(req, res);
 }) as RequestHandler);
 
 export default router; 

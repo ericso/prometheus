@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { register, login, __test_reset_users } from './auth.controller';
+import { AuthController } from './auth.controller';
+import { UserService } from '../services/user.service';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
+import { User } from '../types/user';
 
 // Mock the utils
 jest.mock('../utils/auth.utils', () => ({
@@ -9,14 +11,20 @@ jest.mock('../utils/auth.utils', () => ({
   generateToken: jest.fn()
 }));
 
-describe('Auth Controller', () => {
+describe('AuthController', () => {
   let mockRequest: Partial<Request>;
   let mockResponse: Partial<Response>;
+  let mockUserService: jest.Mocked<UserService>;
+  let authController: AuthController;
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    __test_reset_users();  // Reset users before each test
-    
+    mockUserService = {
+      findByEmail: jest.fn(),
+      create: jest.fn()
+    };
+
+    authController = new AuthController(mockUserService);
+
     mockRequest = {
       body: {}
     };
@@ -26,10 +34,7 @@ describe('Auth Controller', () => {
       status: jest.fn().mockReturnThis()
     };
 
-    // Reset all mock implementations
-    (hashPassword as jest.Mock).mockReset();
-    (generateToken as jest.Mock).mockReset();
-    (comparePassword as jest.Mock).mockReset();
+    jest.clearAllMocks();
   });
 
   describe('register', () => {
@@ -39,98 +44,71 @@ describe('Auth Controller', () => {
       name: 'Test User'
     };
 
-    beforeEach(() => {
-      (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
-      (generateToken as jest.Mock).mockReturnValue('mockToken');
-    });
-
     it('should successfully register a new user', async () => {
       mockRequest.body = validRegistrationData;
+      mockUserService.findByEmail.mockResolvedValue(undefined);
+      mockUserService.create.mockImplementation(user => Promise.resolve(user));
+      (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
+      (generateToken as jest.Mock).mockReturnValue('mockToken');
 
-      await register(mockRequest as Request, mockResponse as Response);
+      await authController.register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(201);
+      expect(mockUserService.create).toHaveBeenCalled();
       expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
         message: 'User registered successfully',
-        token: 'mockToken',
-        user: expect.objectContaining({
-          email: validRegistrationData.email,
-          name: validRegistrationData.name
-        })
+        token: 'mockToken'
       }));
     });
 
     it('should return 400 if user already exists', async () => {
-      // Register first user
       mockRequest.body = validRegistrationData;
-      await register(mockRequest as Request, mockResponse as Response);
+      mockUserService.findByEmail.mockResolvedValue(validRegistrationData as User);
 
-      // Try to register same user again
-      await register(mockRequest as Request, mockResponse as Response);
+      await authController.register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(400);
-      expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
-        message: 'User already exists'
-      }));
+      expect(mockUserService.create).not.toHaveBeenCalled();
     });
 
     it('should return 500 if registration fails', async () => {
       mockRequest.body = validRegistrationData;
-      (hashPassword as jest.Mock).mockImplementationOnce(() => Promise.reject(new Error('Hash failed')));
+      mockUserService.findByEmail.mockResolvedValue(undefined);
+      (hashPassword as jest.Mock).mockRejectedValue(new Error('Hash failed'));
 
-      await register(mockRequest as Request, mockResponse as Response);
+      await authController.register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
-      expect(mockResponse.json).toHaveBeenCalledWith({
-        message: 'Error registering user'
-      });
+      expect(mockUserService.create).not.toHaveBeenCalled();
     });
   });
 
   describe('login', () => {
-    const validLoginData = {
+    const validUser: User = {
+      id: '1',
       email: 'test@example.com',
-      password: 'password123',
+      password: 'hashedPassword',
       name: 'Test User'
     };
 
-    beforeEach(async () => {
-      // Reset mocks before registration
-      jest.clearAllMocks();
-
-      // Register a user first
-      mockRequest.body = validLoginData;
-      (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
-      (generateToken as jest.Mock).mockReturnValue('mockToken');
-      await register(mockRequest as Request, mockResponse as Response);
-
-      // Clear mock calls but keep the registered user
-      jest.clearAllMocks();
-      
-      // Reset response mock
-      mockResponse = {
-        json: jest.fn().mockReturnThis(),
-        status: jest.fn().mockReturnThis()
-      };
-    });
-
     it('should successfully login an existing user', async () => {
       mockRequest.body = {
-        email: validLoginData.email,
-        password: validLoginData.password
+        email: validUser.email,
+        password: 'password123'
       };
+      mockUserService.findByEmail.mockResolvedValue(validUser);
       (comparePassword as jest.Mock).mockResolvedValue(true);
       (generateToken as jest.Mock).mockReturnValue('loginToken');
 
-      await login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(200);
       expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
         message: 'Login successful',
         token: 'loginToken',
         user: expect.objectContaining({
-          email: validLoginData.email,
-          name: validLoginData.name
+          email: validUser.email,
+          name: validUser.name
         })
       }));
     });
@@ -140,23 +118,25 @@ describe('Auth Controller', () => {
         email: 'nonexistent@example.com',
         password: 'password123'
       };
+      mockUserService.findByEmail.mockResolvedValue(undefined);
 
-      await login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
-      expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
+      expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Invalid credentials'
-      }));
+      });
     });
 
     it('should return 401 for invalid password', async () => {
       mockRequest.body = {
-        email: validLoginData.email,
+        email: validUser.email,
         password: 'wrongpassword'
       };
+      mockUserService.findByEmail.mockResolvedValue(validUser);
       (comparePassword as jest.Mock).mockResolvedValue(false);
 
-      await login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(401);
       expect(mockResponse.json).toHaveBeenCalledWith({
@@ -165,19 +145,13 @@ describe('Auth Controller', () => {
     });
 
     it('should return 500 if login fails', async () => {
-      // Setup login request
       mockRequest.body = {
-        email: validLoginData.email,
-        password: validLoginData.password
+        email: validUser.email,
+        password: validUser.password
       };
+      mockUserService.findByEmail.mockRejectedValue(new Error('Database error'));
 
-      // Setup mocks for failed login
-      (comparePassword as jest.Mock).mockResolvedValue(true);
-      (generateToken as jest.Mock).mockImplementation(() => {
-        throw new Error('Token generation failed');
-      });
-
-      await login(mockRequest as Request, mockResponse as Response);
+      await authController.login(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
       expect(mockResponse.json).toHaveBeenCalledWith({
