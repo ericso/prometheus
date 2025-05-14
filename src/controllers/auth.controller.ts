@@ -3,10 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
 import { User } from '../types/user';
 
-// Export users array and add reset function for testing
-export let users: User[] = [];
-export const resetUsers = () => {
-  users = [];
+// Keep users array private to the module
+// TODO: Move to a database
+const users: User[] = [];
+
+// Add test utility function
+export const __test_reset_users = () => {
+  while (users.length) users.pop();
 };
 
 // register is a function that registers a new user
@@ -79,4 +82,4 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({ message: "Error logging in" });
   }
-}; 
+};

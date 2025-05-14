@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { register, login, resetUsers } from './auth.controller';
+import { register, login, __test_reset_users } from './auth.controller';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
 
 // Mock the utils
@@ -14,16 +14,13 @@ describe('Auth Controller', () => {
   let mockResponse: Partial<Response>;
 
   beforeEach(() => {
-    jest.clearAllMocks(); // Clear all mock calls
-
-    // Reset users array
-    resetUsers();
+    jest.clearAllMocks();
+    __test_reset_users();  // Reset users before each test
     
     mockRequest = {
       body: {}
     };
     
-    // Create fresh mockResponse for each test
     mockResponse = {
       json: jest.fn().mockReturnThis(),
       status: jest.fn().mockReturnThis()
@@ -79,14 +76,14 @@ describe('Auth Controller', () => {
 
     it('should return 500 if registration fails', async () => {
       mockRequest.body = validRegistrationData;
-      (hashPassword as jest.Mock).mockRejectedValue(new Error('Hash failed'));
+      (hashPassword as jest.Mock).mockImplementationOnce(() => Promise.reject(new Error('Hash failed')));
 
       await register(mockRequest as Request, mockResponse as Response);
 
       expect(mockResponse.status).toHaveBeenCalledWith(500);
-      expect(mockResponse.json).toHaveBeenCalledWith(expect.objectContaining({
+      expect(mockResponse.json).toHaveBeenCalledWith({
         message: 'Error registering user'
-      }));
+      });
     });
   });
 
