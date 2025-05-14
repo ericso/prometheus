@@ -3,9 +3,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
 import { User } from '../types/user';
 
-// In-memory user store (replace with a real database in production)
-const users: User[] = [];
+// Export users array and add reset function for testing
+export let users: User[] = [];
+export const resetUsers = () => {
+  users = [];
+};
 
+// register is a function that registers a new user
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password, name } = req.body;
@@ -43,6 +47,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+// login is a function that logs in a user
 export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -62,7 +67,7 @@ export const login = async (req: Request, res: Response) => {
     // Generate token
     const token = generateToken(user);
 
-    res.json({
+    return res.status(200).json({
       message: "Login successful",
       token,
       user: {
@@ -72,6 +77,6 @@ export const login = async (req: Request, res: Response) => {
       }
     });
   } catch (error) {
-    res.status(500).json({ message: "Error logging in" });
+    return res.status(500).json({ message: "Error logging in" });
   }
 }; 
