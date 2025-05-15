@@ -1,5 +1,5 @@
 import { InMemoryUserService } from './in-memory-user.service';
-import { User } from '../models/user';
+import { User } from '@models/user';
 
 describe('InMemoryUserService', () => {
   let userService: InMemoryUserService;

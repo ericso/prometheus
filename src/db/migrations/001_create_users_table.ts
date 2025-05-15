@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { pool } from '../../config/database';
+import { pool } from '@config/database';
 
 export async function up(db: Pool = pool): Promise<void> {
   await db.query(`
