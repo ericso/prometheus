@@ -3,9 +3,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
 import { UserService, InMemoryUserService } from '../services/user.service';
 import { User } from '../types/user';
+import { PostgresUserService } from '../services/postgres-user.service';
 
 export class AuthController {
-  constructor(private userService: UserService = new InMemoryUserService()) {}
+  constructor(private userService: UserService = new PostgresUserService()) {}
 
   register = async (req: Request, res: Response): Promise<Response> => {
     try {
