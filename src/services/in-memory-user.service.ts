@@ -1,5 +1,5 @@
-import {User} from "../models/user";
-import {UserService} from "./user.service";
+import {User} from "@models/user";
+import {UserService} from "@services/user.service";
 
 export class InMemoryUserService implements UserService {
     private users: User[] = [];

@@ -1,6 +1,6 @@
 import express, { Express, Request, Response, NextFunction, RequestHandler } from 'express';
-import authRoutes from './routes/auth.routes';
-import { verifyToken, AuthRequest } from './middleware/auth.middleware';
+import authRoutes from '@routes/auth.routes';
+import { verifyToken, AuthRequest } from '@middleware/auth.middleware';
 
 const app: Express = express();
 const port = process.env.PORT || 3000;

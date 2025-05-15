@@ -1,11 +1,11 @@
 import { Request, Response } from 'express';
-import { AuthController } from './auth.controller';
-import { UserService } from '../services/user.service';
-import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
-import { User } from '../models/user';
+import { AuthController } from '@controllers/auth.controller';
+import { UserService } from '@services/user.service';
+import { hashPassword, comparePassword, generateToken } from '@utils/auth.utils';
+import { User } from '@models/user';
 
 // Mock the utils
-jest.mock('../utils/auth.utils', () => ({
+jest.mock('@utils/auth.utils', () => ({
   hashPassword: jest.fn(),
   comparePassword: jest.fn(),
   generateToken: jest.fn()

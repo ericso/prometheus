@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET, JWT_EXPIRES_IN } from '../config/auth.config';
-import { User } from '../models/user';
+import { JWT_SECRET, JWT_EXPIRES_IN } from '@config/auth.config';
+import { User } from '@models/user';
 
 export const hashPassword = async (password: string): Promise<string> => {
   const salt = await bcrypt.genSalt(10);

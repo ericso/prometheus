@@ -1,4 +1,4 @@
-import { pool } from '../config/database';
+import { pool } from '@config/database';
 import * as createUsersTable from './migrations/001_create_users_table';
 
 async function migrate(direction: 'up' | 'down' = 'up') {

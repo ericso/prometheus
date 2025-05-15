@@ -1,7 +1,7 @@
 import { Pool } from 'pg';
-import { User } from '../models/user';
-import { UserService } from './user.service';
-import { pool } from '../config/database';
+import { User } from '@models/user';
+import { UserService } from '@services/user.service';
+import { pool } from '@config/database';
 
 export class PostgresUserService implements UserService {
   constructor(private db: Pool = pool) {}
