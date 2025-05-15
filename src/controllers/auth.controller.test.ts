@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthController } from './auth.controller';
 import { UserService } from '../services/user.service';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
-import { User } from '../types/user';
+import { User } from '../models/user';
 
 // Mock the utils
 jest.mock('../utils/auth.utils', () => ({

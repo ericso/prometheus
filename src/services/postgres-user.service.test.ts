@@ -1,6 +1,6 @@
 import { Pool, QueryResult, QueryConfig, QueryResultRow } from 'pg';
 import { PostgresUserService } from './postgres-user.service';
-import { User } from '../types/user';
+import { User } from '../models/user';
 
 describe('PostgresUserService', () => {
   let mockPool: { 
