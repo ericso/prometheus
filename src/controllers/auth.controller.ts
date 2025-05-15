@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import { hashPassword, comparePassword, generateToken } from '../utils/auth.utils';
 import { UserService } from '../services/user.service';
-import { User } from '../types/user';
+import { User } from '../models/user';
 import { PostgresUserService } from '../services/postgres-user.service';
 
 export class AuthController {

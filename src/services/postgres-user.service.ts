@@ -1,5 +1,5 @@
 import { Pool } from 'pg';
-import { User } from '../types/user';
+import { User } from '../models/user';
 import { UserService } from './user.service';
 import { pool } from '../config/database';
 
