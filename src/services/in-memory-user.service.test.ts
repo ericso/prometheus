@@ -1,4 +1,4 @@
-import { InMemoryUserService } from './user.service';
+import { InMemoryUserService } from './in-memory-user.service';
 import { User } from '../types/user';
 
 describe('InMemoryUserService', () => {
