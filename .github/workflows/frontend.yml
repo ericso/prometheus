@@ -35,9 +35,10 @@ jobs:
       run: npm ci
 
     - name: Run unit tests
-      run: npm run test:unit -- --run
+      run: NODE_ENV=test npm run test:unit -- --run
       env:
-        NODE_OPTIONS: --experimental-vm-modules --experimental-global-webcrypto
+        NODE_OPTIONS: --experimental-vm-modules --experimental-global-webcrypto --no-warnings
+        VITEST_MAX_THREADS: 1
 
     - name: Run linter
       run: npm run lint
