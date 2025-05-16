@@ -1,6 +1,6 @@
 # Artemis
 
-A monorepo containing a full-stack TypeScript application with Express backend and React frontend.
+A monorepo containing a full-stack TypeScript application with Express backend and Vuejs frontend.
 
 ## Project Structure
 
