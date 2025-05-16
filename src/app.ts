@@ -1,4 +1,5 @@
 import express, { Express, Request, Response, NextFunction, RequestHandler } from 'express';
+import cors from 'cors';
 import authRoutes from '@routes/auth.routes';
 import { verifyToken, AuthRequest } from '@middleware/auth.middleware';
 
@@ -7,6 +8,14 @@ const port = process.env.PORT || 3000;
 
 // Middleware for parsing JSON bodies
 app.use(express.json());
+
+// CORS middleware
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173', // Vue.js dev server default port
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
 // Routes
 app.use('/auth', authRoutes);
@@ -33,4 +42,6 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 // Start server
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-}); 
+});
+
+export default app; 
