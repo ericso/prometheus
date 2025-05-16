@@ -2,6 +2,14 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { auth, type AuthResponse } from '@/services/api'
 
+interface ApiError extends Error {
+  response?: {
+    data?: {
+      message?: string
+    }
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('token'))
   const user = ref<AuthResponse['user'] | null>(
@@ -31,8 +39,9 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await auth.register({ email, password })
       setAuthData(response)
       return true
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Registration failed'
+    } catch (err: unknown) {
+      const apiError = err as ApiError
+      error.value = apiError.response?.data?.message || 'Registration failed'
       return false
     } finally {
       loading.value = false
@@ -46,8 +55,9 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await auth.login({ email, password })
       setAuthData(response)
       return true
-    } catch (err: any) {
-      error.value = err.response?.data?.message || 'Login failed'
+    } catch (err: unknown) {
+      const apiError = err as ApiError
+      error.value = apiError.response?.data?.message || 'Login failed'
       return false
     } finally {
       loading.value = false

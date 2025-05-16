@@ -1,7 +1,7 @@
 import * as nodeCrypto from 'crypto'
 
 if (!global.crypto) {
-    global.crypto = require('crypto')
+    global.crypto = nodeCrypto as Crypto
 }
 
 global.crypto.getRandomValues = <T extends ArrayBufferView | null>(array: T): T => {
