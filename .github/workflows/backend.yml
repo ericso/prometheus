@@ -1,14 +1,27 @@
-name: CI
+name: Backend CI
 
 on:
   push:
     branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+      - 'package.json'
+      - 'package-lock.json'
   pull_request:
     branches: [ main ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend.yml'
+      - 'package.json'
+      - 'package-lock.json'
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
 
     strategy:
       matrix:
@@ -21,9 +34,29 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
 
-    - name: Install dependencies
+    - name: Cache root dependencies
+      uses: actions/cache@v4
+      with:
+        path: node_modules
+        key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ matrix.node-version }}-
+          ${{ runner.os }}-node-
+
+    - name: Cache backend dependencies
+      uses: actions/cache@v4
+      with:
+        path: backend/node_modules
+        key: ${{ runner.os }}-node-backend-${{ matrix.node-version }}-${{ hashFiles('backend/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-backend-${{ matrix.node-version }}-
+          ${{ runner.os }}-node-backend-
+
+    - name: Install root dependencies
+      run: cd .. && npm ci
+
+    - name: Install backend dependencies
       run: npm ci
 
     - name: Type check
