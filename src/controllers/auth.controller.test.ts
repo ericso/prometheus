@@ -20,7 +20,8 @@ describe('AuthController', () => {
   beforeEach(() => {
     mockUserService = {
       findByEmail: jest.fn(),
-      create: jest.fn()
+      create: jest.fn(),
+      softDelete: jest.fn()
     };
 
     authController = new AuthController(mockUserService);
@@ -40,14 +41,18 @@ describe('AuthController', () => {
   describe('register', () => {
     const validRegistrationData = {
       email: 'test@example.com',
-      password: 'password123',
-      name: 'Test User'
+      password: 'password123'
     };
 
     it('should successfully register a new user', async () => {
       mockRequest.body = validRegistrationData;
       mockUserService.findByEmail.mockResolvedValue(undefined);
-      mockUserService.create.mockImplementation(user => Promise.resolve(user));
+      mockUserService.create.mockImplementation(user => Promise.resolve({
+        ...user,
+        created_at: new Date(),
+        updated_at: undefined,
+        deleted_at: undefined
+      }));
       (hashPassword as jest.Mock).mockResolvedValue('hashedPassword');
       (generateToken as jest.Mock).mockReturnValue('mockToken');
 
@@ -63,7 +68,14 @@ describe('AuthController', () => {
 
     it('should return 400 if user already exists', async () => {
       mockRequest.body = validRegistrationData;
-      mockUserService.findByEmail.mockResolvedValue(validRegistrationData as User);
+      mockUserService.findByEmail.mockResolvedValue({
+        id: '1',
+        email: validRegistrationData.email,
+        password: 'hashedPassword',
+        created_at: new Date(),
+        updated_at: undefined,
+        deleted_at: undefined
+      });
 
       await authController.register(mockRequest as Request, mockResponse as Response);
 
@@ -88,7 +100,9 @@ describe('AuthController', () => {
       id: '1',
       email: 'test@example.com',
       password: 'hashedPassword',
-      name: 'Test User'
+      created_at: new Date(),
+      updated_at: undefined,
+      deleted_at: undefined
     };
 
     it('should successfully login an existing user', async () => {
@@ -107,8 +121,8 @@ describe('AuthController', () => {
         message: 'Login successful',
         token: 'loginToken',
         user: expect.objectContaining({
-          email: validUser.email,
-          name: validUser.name
+          id: validUser.id,
+          email: validUser.email
         })
       }));
     });
@@ -118,6 +132,22 @@ describe('AuthController', () => {
         email: 'nonexistent@example.com',
         password: 'password123'
       };
+      mockUserService.findByEmail.mockResolvedValue(undefined);
+
+      await authController.login(mockRequest as Request, mockResponse as Response);
+
+      expect(mockResponse.status).toHaveBeenCalledWith(401);
+      expect(mockResponse.json).toHaveBeenCalledWith({
+        message: 'Invalid credentials'
+      });
+    });
+
+    it('should return 401 for soft-deleted user', async () => {
+      mockRequest.body = {
+        email: validUser.email,
+        password: 'password123'
+      };
+      // findByEmail will return undefined for soft-deleted users
       mockUserService.findByEmail.mockResolvedValue(undefined);
 
       await authController.login(mockRequest as Request, mockResponse as Response);
