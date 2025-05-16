@@ -1,15 +1,6 @@
-import * as nodeCrypto from 'crypto'
+import { webcrypto } from 'node:crypto'
 
-if (!global.crypto) {
-    global.crypto = nodeCrypto as Crypto
-}
-
-global.crypto.getRandomValues = <T extends ArrayBufferView | null>(array: T): T => {
-    if (array === null) return array
-    const bytes = nodeCrypto.randomBytes(array.byteLength)
-    const view = array as unknown as Uint8Array
-    for (let i = 0; i < bytes.length; i++) {
-        view[i] = bytes[i]
-    }
-    return array
-}
+// Polyfill crypto for Node.js environment
+Object.defineProperty(globalThis, 'crypto', {
+    value: webcrypto
+})
