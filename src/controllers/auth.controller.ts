@@ -10,7 +10,7 @@ export class AuthController {
 
   register = async (req: Request, res: Response): Promise<Response> => {
     try {
-      const { email, password, name } = req.body;
+      const { email, password } = req.body;
 
       const existingUser = await this.userService.findByEmail(email);
       if (existingUser) {
@@ -22,20 +22,20 @@ export class AuthController {
         id: uuidv4(),
         email,
         password: hashedPassword,
-        name
+        created_at: new Date(),
+        updated_at: null,
+        deleted_at: null,
       };
 
-      await this.userService.create(newUser);
-
-      const token = generateToken(newUser);
+      const createdUser = await this.userService.create(newUser);
+      const token = generateToken(createdUser);
 
       return res.status(201).json({
         message: "User registered successfully",
         token,
         user: {
-          id: newUser.id,
-          email: newUser.email,
-          name: newUser.name
+          id: createdUser.id,
+          email: createdUser.email
         }
       });
     } catch (error) {
@@ -64,8 +64,7 @@ export class AuthController {
         token,
         user: {
           id: user.id,
-          email: user.email,
-          name: user.name
+          email: user.email
         }
       });
     } catch (error) {

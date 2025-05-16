@@ -93,4 +93,35 @@ To create new migrations, add them to the `src/db/migrations` directory and upda
 - **Up migrations** create or modify database structures in a non-destructive way
 - **Down migrations** (rollbacks) will DROP affected tables and DELETE ALL DATA
 - Always backup your database before running migrations in production
-- Test migrations in a development environment first 
+- Test migrations in a development environment first
+
+## Timestamp Conventions
+
+All models in the system follow these timestamp conventions:
+
+### created_at
+- Automatically set when a record is created
+- Non-nullable
+- Set by the database using `DEFAULT CURRENT_TIMESTAMP`
+- Never modified after creation
+
+### updated_at
+- Nullable
+- Initially undefined/null when record is created
+- Only set when the record's data is explicitly updated
+- Not modified during soft deletion
+- Updated via application logic, not database triggers
+
+### deleted_at
+- Nullable
+- Initially undefined/null when record is created
+- Set to current timestamp when record is soft-deleted
+- Never modified once set (no un-deletion)
+- Used to filter out soft-deleted records in queries
+
+These conventions ensure consistent behavior across all models and make it clear:
+- When a record was created
+- If/when it was last modified
+- If/when it was soft-deleted
+
+Example queries should always include `WHERE deleted_at IS NULL` unless specifically querying for deleted records. 
