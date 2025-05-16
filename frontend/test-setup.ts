@@ -1,16 +1,30 @@
-import { Crypto } from '@peculiar/webcrypto';
+async function setupCrypto() {
+    try {
+        const { webcrypto } = await import('node:crypto');
+        
+        if (!globalThis.crypto || !globalThis.crypto.getRandomValues) {
+            Object.defineProperty(globalThis, 'crypto', {
+                value: webcrypto,
+                writable: false,
+                configurable: false
+            });
+        }
+        
+        if (!global.crypto || !global.crypto.getRandomValues) {
+            Object.defineProperty(global, 'crypto', {
+                value: webcrypto,
+                writable: false,
+                configurable: false
+            });
+        }
+    } catch (error) {
+        console.error('Failed to setup crypto:', error);
+        throw error;
+    }
+}
 
-const crypto = new Crypto();
+// Run setup before tests
+await setupCrypto();
 
-// Ensure crypto is available globally with all required methods
-Object.defineProperty(global, 'crypto', {
-    value: crypto,
-    writable: false,
-    configurable: false
-});
-
-Object.defineProperty(globalThis, 'crypto', {
-    value: crypto,
-    writable: false,
-    configurable: false
-});
+// Make this file a module
+export {};
