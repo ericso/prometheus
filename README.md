@@ -1,32 +1,53 @@
 # Artemis
 
-A Node.js application with Express and TypeScript, featuring JWT authentication.
+A monorepo containing a full-stack TypeScript application with Express backend and React frontend.
 
-## Setup
+## Project Structure
+
+```
+artemis/
+├── backend/         # Express.js + TypeScript backend
+├── frontend/        # React frontend
+└── README.md       # This file
+```
+
+## Backend
+
+The backend service is built with Express.js and TypeScript, featuring:
+- JWT Authentication
+- PostgreSQL Database
+- Database Migrations
+- Development hot-reload
+- Jest Testing Suite
+
+### Backend Setup
 
 1. Install dependencies:
 ```bash
+cd backend
 npm install
 ```
 
 2. Configure environment variables:
-Create a `.env` file in the root directory with the following variables:
+Create a `.env` file in the `backend` directory with:
 ```env
-# Database Configuration
+PORT=3000
+DATABASE_URL=postgresql://user:password@localhost:5432/artemis
+JWT_SECRET=your_secure_secret_key  # Required in production, defaults to 'just-for-dev' in development
+
+# Alternative Database Configuration
 DB_USER=your_db_user
 DB_HOST=your_db_host
 DB_NAME=your_db_name
 DB_PASSWORD=your_db_password
 DB_PORT=5432
-
-# Authentication
-JWT_SECRET=your_secure_secret_key  # Required in production, defaults to 'just-for-dev' in development
 ```
 
 Note: For production environments, always set a secure JWT_SECRET. The default development value should not be used in production.
 
 3. Database Setup:
 ```bash
+cd backend
 # Run migrations
 npm run migrate
 
@@ -36,13 +57,17 @@ npm run migrate:down
 
 ⚠️ **Warning**: Down migrations will DROP tables and delete all data. Use with caution, especially in production environments.
 
-4. Development:
+### Backend Development
+
 ```bash
+cd backend
 npm run dev
 ```
 
-5. Testing:
+### Backend Testing
+
 ```bash
+cd backend
 # Run all tests
 npm test
 
@@ -53,40 +78,26 @@ npm run test:watch
 npm run test:coverage
 ```
 
-6. Build for production:
+### Backend Production Build
+
 ```bash
+cd backend
 npm run build
 npm start
 ```
 
-## Features
+## Frontend
 
-- Express.js with TypeScript
-- JWT Authentication
-- PostgreSQL Database
-- Database Migrations
-- Development hot-reload
-- Jest Testing Suite
-
-## Available Scripts
-
-- `npm run dev` - Start development server with hot-reload
-- `npm run build` - Build the application for production
-- `npm start` - Start the production server
-- `npm test` - Run tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage report
-- `npm run migrate` - Run database migrations
-- `npm run migrate:down` - Rollback database migrations (⚠️ drops tables)
+For frontend development notes and setup instructions, see [frontend/DEVELOPMENT_NOTES.md](frontend/DEVELOPMENT_NOTES.md).
 
 ## Database Migrations
 
-The application uses a simple migration system located in `src/db/migrate.ts`. Migrations are executed in order and can be rolled back if needed.
+The application uses a simple migration system located in `backend/src/db/migrate.ts`. Migrations are executed in order and can be rolled back if needed.
 
 Current migrations:
 1. Create users table (`001_create_users_table`)
 
-To create new migrations, add them to the `src/db/migrations` directory and update the `migrate.ts` file accordingly.
+To create new migrations, add them to the `backend/src/db/migrations` directory and update the `migrate.ts` file accordingly.
 
 ### Migration Safety
 
