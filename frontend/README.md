@@ -171,6 +171,20 @@ npm run build
 
 The built files will be in the `dist` directory and can be served using any static file server.
 
+## Continuous Integration
+
+The project uses GitHub Actions for continuous integration. The following checks are run on each pull request and push to the main branch:
+
+- Unit tests across multiple Node.js versions (16.x, 18.x, 20.x)
+- ESLint code linting
+- TypeScript type checking
+
+The workflow configuration can be found in `.github/workflows/test.yml`.
+
+### Status Badges
+
+[![Frontend Tests](https://github.com/ericso/artemis/actions/workflows/test.yml/badge.svg)](https://github.com/<username>/artemis/actions/workflows/test.yml)
+
 ## License
 
 [MIT License](LICENSE)
