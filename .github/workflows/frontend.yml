@@ -37,7 +37,7 @@ jobs:
     - name: Run unit tests
       run: NODE_ENV=test npm run test:unit -- --run
       env:
-        NODE_OPTIONS: --experimental-vm-modules --experimental-global-webcrypto --no-warnings
+        NODE_OPTIONS: --experimental-vm-modules
         VITEST_MAX_THREADS: 1
 
     - name: Run linter
