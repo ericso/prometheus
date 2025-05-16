@@ -19,7 +19,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        node-version: [18.x, 20.x]
 
     steps:
     - uses: actions/checkout@v4
@@ -35,13 +35,9 @@ jobs:
       run: npm ci
 
     - name: Run unit tests
-      run: |
-        node -v
-        npm -v
-        NODE_ENV=test NODE_DEBUG=crypto,module npm run test:unit -- --run --reporter verbose
+      run: NODE_ENV=test npm run test:unit -- --run
       env:
-        NODE_OPTIONS: --experimental-vm-modules --trace-warnings
-        DEBUG: '*'
+        NODE_OPTIONS: --experimental-vm-modules
         VITEST_MAX_THREADS: 1
 
     - name: Run linter
