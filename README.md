@@ -1,13 +1,13 @@
 # Prometheus
 
-A monorepo containing a full-stack TypeScript application with Express backend and React frontend.
+A monorepo containing a full-stack TypeScript application with Express backend and Vue.js frontend.
 
 ## Project Structure
 
 ```
 prometheus/
 ├── backend/         # Express.js + TypeScript backend
-├── frontend/        # React frontend
+├── frontend/        # Vue.js frontend
 └── README.md       # This file
 ```
 
