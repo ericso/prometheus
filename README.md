@@ -32,7 +32,7 @@ npm install
 Create a `.env` file in the `backend` directory with:
 ```env
 PORT=3000
-DATABASE_URL=postgresql://user:password@localhost:5432/prometheus
+DATABASE_URL=postgresql://user:password@localhost:5432/database_name
 JWT_SECRET=your_secure_secret_key  # Required in production, defaults to 'just-for-dev' in development
 
 # Alternative Database Configuration
