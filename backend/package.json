@@ -1,7 +1,7 @@
 {
-  "name": "artemis-backend",
+  "name": "prometheus-backend",
   "version": "1.0.0",
-  "description": "Backend service for Artemis",
+  "description": "Backend service for Prometheus",
   "main": "dist/app.js",
   "scripts": {
     "start": "node dist/app.js",

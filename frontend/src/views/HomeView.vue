@@ -3,7 +3,7 @@
 
 <template>
   <main class="home">
-    <h1>Welcome to Artemis</h1>
+    <h1>Welcome to Prometheus</h1>
     <div class="auth-links">
       <RouterLink to="/login" class="auth-button login">Login</RouterLink>
       <RouterLink to="/register" class="auth-button register">Create Account</RouterLink>
