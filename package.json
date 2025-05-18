@@ -1,7 +1,7 @@
 {
-  "name": "artemis-monorepo",
+  "name": "prometheus-monorepo",
   "version": "1.0.0",
-  "description": "Artemis Monorepo",
+  "description": "Prometheus Monorepo",
   "private": true,
   "workspaces": [
     "frontend",
